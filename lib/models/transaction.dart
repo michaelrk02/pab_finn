@@ -10,28 +10,28 @@ class Transaction {
     int id;
     int ledgerID;
     DateTime timestamp;
-    String type;
+    TransactionType type;
+    int amount;
     String title;
     String description;
-    int amount;
 
     Transaction({
         required this.id,
         required this.ledgerID,
         required this.timestamp,
         required this.type,
+        required this.amount,
         required this.title,
-        required this.description,
-        required this.amount
+        required this.description
     });
 
     factory Transaction.create({
         required Ledger ledger,
         required DateTime timestamp,
-        required String type,
+        required TransactionType type,
+        required int amount,
         required String title,
-        required String description,
-        required int amount
+        required String description
     }) {
         var id = Random().nextInt(1 << 32);
         return Transaction(
@@ -39,9 +39,9 @@ class Transaction {
             ledgerID: ledger.id,
             timestamp: timestamp,
             type: type,
+            amount: amount,
             title: title,
-            description: description,
-            amount: amount
+            description: description
         );
     }
 
@@ -50,10 +50,10 @@ class Transaction {
             id: data['id'],
             ledgerID: data['ledger'],
             timestamp: DateTime.parse(data['timestamp']),
-            type: data['type'],
+            type: Transaction.typeFromString(data['type']),
+            amount: data['amount'],
             title: data['title'],
-            description: data['description'],
-            amount: data['amount']
+            description: data['description']
         );
     }
 
@@ -70,8 +70,24 @@ class Transaction {
         return transaction;
     }
 
+    Future<void> refresh() async {
+        Transaction? transaction = await Transaction.find(this.id);
+        if (transaction != null) {
+            this.ledgerID = transaction.ledgerID;
+            this.timestamp = transaction.timestamp;
+            this.type = transaction.type;
+            this.amount = transaction.amount;
+            this.title = transaction.title;
+            this.description = transaction.description;
+        }
+    }
+
     Future<int> save() async {
         return Transaction.db().insert(Transaction.table, this.prepare(), conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
+    }
+
+    Future<void> delete() async {
+        await Transaction.db().delete(Transaction.table, where: 'id = ?', whereArgs: [this.id]);
     }
 
     Future<Ledger?> get ledger async {
@@ -83,12 +99,37 @@ class Transaction {
             'id': this.id,
             'ledger': this.ledgerID,
             'timestamp': this.timestamp.toIso8601String(),
-            'type': this.type,
+            'type': Transaction.typeToString(this.type),
+            'amount': this.amount,
             'title': this.title,
-            'description': this.description,
-            'amount': this.amount
+            'description': this.description
         };
     }
 
+    static TransactionType typeFromString(String type) {
+        switch (type) {
+        case 'income':
+            return TransactionType.income;
+        case 'expense':
+            return TransactionType.expense;
+        }
+        throw 'Invalid type';
+    }
+
+    static String typeToString(TransactionType type) {
+        switch (type) {
+        case TransactionType.income:
+            return 'income';
+        case TransactionType.expense:
+            return 'expense';
+        }
+        throw 'Invalid operation';
+    }
+
+}
+
+enum TransactionType {
+    income,
+    expense
 }
 

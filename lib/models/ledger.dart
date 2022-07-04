@@ -80,6 +80,15 @@ class Ledger {
         return ledger;
     }
 
+    Future<void> refresh() async {
+        Ledger? ledger = await Ledger.find(this.id);
+        if (ledger != null) {
+            this.title = ledger.title;
+            this.description = ledger.description;
+            this.createdAt = ledger.createdAt;
+        }
+    }
+
     Future<int> save() async {
         return await Ledger.db().insert(Ledger.table, this.prepare(), conflictAlgorithm: sqflite.ConflictAlgorithm.replace);
     }
@@ -94,6 +103,11 @@ class Ledger {
         return List<Transaction>.generate(list.length, (i) {
             return Transaction.parse(list[i]);
         });
+    }
+
+    Future<void> delete() async {
+        await Transaction.db().delete(Transaction.table, where: 'ledger = ?', whereArgs: [this.id]);
+        await Ledger.db().delete(Ledger.table, where: 'id = ?', whereArgs: [this.id]);
     }
 
     Future<int> get totalIncome async {

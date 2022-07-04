@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:pab_finn/models/ledger.dart';
 import 'package:pab_finn/models/transaction.dart';
 import 'package:pab_finn/helpers/number_helper.dart';
+import 'package:pab_finn/components/dialogs/transaction_editor.dart';
 
 class TransactionListView extends StatefulWidget {
     final Ledger ledger;
@@ -41,7 +42,12 @@ class TransactionListViewState extends State<TransactionListView> {
                             elevation: 2.0,
                             margin: EdgeInsets.symmetric(vertical: 8.0),
                             child: ListTile(
-                                onTap: () {},
+                                onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => _TransactionDetailsDialog(transaction: this._transactions[index])
+                                    );
+                                },
                                 leading: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -51,12 +57,17 @@ class TransactionListViewState extends State<TransactionListView> {
                                     ]
                                 ),
                                 title: Text(this._transactions[index].title),
-                                subtitle: this._transactions[index].type == 'income'
+                                subtitle: this._transactions[index].type == TransactionType.income
                                     ? Text('+ ' + NumberHelper.formatIDR(this._transactions[index].amount), style: TextStyle(color: Colors.green))
                                     : Text('- ' + NumberHelper.formatIDR(this._transactions[index].amount), style: TextStyle(color: Colors.red)),
                                 trailing: IconButton(
                                     icon: Icon(Icons.edit),
-                                    onPressed: () {}
+                                    onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) => TransactionEditorDialog(transaction: this._transactions[index], action: TransactionEditorAction.update)
+                                        );
+                                    }
                                 )
                             )
                         )
@@ -78,5 +89,36 @@ class TransactionListViewState extends State<TransactionListView> {
             this.setState(() {});
         }
     }
+}
+
+class _TransactionDetailsDialog extends StatelessWidget {
+
+    Transaction transaction;
+
+    _TransactionDetailsDialog({
+        required this.transaction,
+        Key? key
+    }) : super(key: key);
+
+    @override
+    Widget build(BuildContext context) {
+        return SimpleDialog(
+            title: Text(this.transaction.title),
+            children: <Widget>[Container(
+                width: 300,
+                height: 300,
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: ListView(
+                    children: <Widget>[
+                        ListTile(leading: Icon(Icons.schedule), title: Text(DateFormat('yyyy-MM-dd HH:mm:ss').format(this.transaction.timestamp))),
+                        ListTile(leading: Icon(Icons.credit_card), title: Text(Transaction.typeToString(this.transaction.type))),
+                        ListTile(leading: Icon(Icons.attach_money), title: Text(NumberHelper.formatIDR(this.transaction.amount))),
+                        ListTile(leading: Icon(Icons.notes), title: Text(this.transaction.description))
+                    ]
+                )
+            )]
+        );
+    }
+
 }
 

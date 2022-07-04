@@ -127,7 +127,7 @@ class LedgerListViewState extends State<LedgerListView> {
         return () async {
             var ledger = await Ledger.find(ledgerID);
             if (ledger != null) {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => LedgerPage(ledger: ledger)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => LedgerPage(ledger: ledger, key: LedgerPage.active)));
             }
         };
     }

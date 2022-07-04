@@ -3,6 +3,7 @@ import 'package:pab_finn/components/app.dart';
 import 'package:pab_finn/components/main_app_bar.dart';
 import 'package:pab_finn/components/main_drawer.dart';
 import 'package:pab_finn/components/ledger_list_view.dart';
+import 'package:pab_finn/components/dialogs/ledger_editor.dart';
 import 'package:pab_finn/models/ledger.dart';
 
 class LedgersPage extends StatefulWidget {
@@ -28,7 +29,12 @@ class _LedgersPageState extends State<LedgersPage> {
             appBar: _LedgersPageAppBar(),
             drawer: MainDrawer(context: context),
             floatingActionButton: FloatingActionButton(
-                onPressed: () {},
+                onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) => LedgerEditorDialog(ledger: Ledger.create(title: '', description: ''), action: LedgerEditorAction.create)
+                    );
+                },
                 backgroundColor: Theme.of(context).colorScheme.tertiary,
                 foregroundColor: Theme.of(context).colorScheme.inversePrimary,
                 child: Icon(Icons.add)
