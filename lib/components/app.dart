@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pab_finn/components/pages/ledgers_page.dart';
+import 'package:pab_finn/components/pages/home_page.dart';
 
 class App extends StatelessWidget {
 
@@ -17,7 +17,7 @@ class App extends StatelessWidget {
                     tertiary: Colors.purple
                 )
             ),
-            home: LedgersPage()
+            home: HomePage()
         );
     }
 

@@ -32,9 +32,9 @@ class _TransactionEditorDialogState extends State<TransactionEditorDialog> {
     late DateTime _timestampDateController;
     late TimeOfDay _timestampTimeController;
     late TransactionType _typeController;
+    late TextEditingController _amountController;
     late TextEditingController _titleController;
     late TextEditingController _descriptionController;
-    late TextEditingController _amountController;
 
     _TransactionEditorDialogState({
         required this.transaction,
@@ -47,9 +47,9 @@ class _TransactionEditorDialogState extends State<TransactionEditorDialog> {
         this._timestampDateController = DateTime.parse(DateFormat('yyyy-MM-dd').format(this.transaction.timestamp));
         this._timestampTimeController = TimeOfDay.fromDateTime(this.transaction.timestamp);
         this._typeController = this.transaction.type;
+        this._amountController = TextEditingController(text: this.transaction.amount.toString());
         this._titleController = TextEditingController(text: this.transaction.title);
         this._descriptionController = TextEditingController(text: this.transaction.description);
-        this._amountController = TextEditingController(text: this.transaction.amount.toString());
     }
 
     @override
@@ -138,6 +138,11 @@ class _TransactionEditorDialogState extends State<TransactionEditorDialog> {
                                 ]
                             ),
                             TextField(
+                                controller: this._amountController,
+                                decoration: InputDecoration(labelText: 'Amount'),
+                                keyboardType: TextInputType.numberWithOptions(signed: true)
+                            ),
+                            TextField(
                                 controller: this._titleController,
                                 decoration: InputDecoration(labelText: 'Title')
                             ),
@@ -145,11 +150,6 @@ class _TransactionEditorDialogState extends State<TransactionEditorDialog> {
                                 controller: this._descriptionController,
                                 decoration: InputDecoration(labelText: 'Description'),
                                 maxLines: null
-                            ),
-                            TextField(
-                                controller: this._amountController,
-                                decoration: InputDecoration(labelText: 'Amount'),
-                                keyboardType: TextInputType.numberWithOptions(signed: true)
                             )
                         ]
                     )
